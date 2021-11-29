@@ -4,9 +4,9 @@
 # Exists plenty of other ways of doing this ;)
 mkdir /opt/flask_app
 
-wget ${bucket_and_key_object} -O /tmp/tmp_flask_app.zip
+aws s3 cp s3://${bucket}/app/app.zip /tmp/tmp_flask_app.zip
 
-unzip /tmp/tmp_flask_app.zip /opt/flask_app/
+unzip /tmp/tmp_flask_app.zip -d /opt/flask_app/
 
 cd /opt/flask_app
 

@@ -57,3 +57,21 @@ pytest
 # export TF_VARS_* here
 terraform destroy
 ```
+
+## How to test it
+```bash
+# Get the cloudfront output from terraform apply 
+
+### Assets from s3 origin
+curl -I -XGET https://d34n21hg7e2gyt.cloudfront.net/assets/css/bootstrap-grid.css -H "Host: demo.rondi.ninja
+
+curl -I -XGET https://d34n21hg7e2gyt.cloudfront.net/assets/js/bootstrap.bundle.js -H "Host: demo.rondi.ninja"
+
+### Request to the ec2 flask app
+curl -I -XGET https://d34n21hg7e2gyt.cloudfront.net/ -H "Host: demo.rondi.ninja"
+
+curl -I -XGET https://d34n21hg7e2gyt.cloudfront.net/by-header -H "Host: demo.rondi.ninja"
+
+### Request to the lambdas@edge
+curl -I -XGET https://d34n21hg7e2gyt.cloudfront.net/redirect-to-home -H "Host: demo.rondi.ninja"
+```

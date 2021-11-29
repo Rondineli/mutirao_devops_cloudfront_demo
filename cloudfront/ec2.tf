@@ -65,7 +65,7 @@ data "template_file" "user_data" {
   template = file("${path.module}/files/userdata.tpl")
 
   vars = {
-    bucket_and_key_object = "http://${aws_s3_bucket.public-code-bucket.id}/app/app.zip"
+    bucket = aws_s3_bucket.public-code-bucket.id
   }
 }
 
@@ -73,6 +73,7 @@ resource "aws_launch_configuration" "lc-app-nodes" {
   associate_public_ip_address = true
   image_id                    = data.aws_ami.ec2.id
   instance_type               = var.instance_type
+  iam_instance_profile        = aws_iam_instance_profile.profile.arn
   name_prefix                 = "flask-example-app"
   security_groups             = [aws_security_group.allow_to_ec2.id]
   user_data                   = data.template_file.user_data.rendered
