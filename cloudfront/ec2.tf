@@ -4,12 +4,12 @@ resource "aws_security_group" "allow_http_traffic" {
   vpc_id      = data.aws_vpc.selected.id
 
   ingress {
-    description      = "Http for the app"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-    self             = true
+    description = "Http for the app"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    self        = true
   }
 
   egress {
@@ -31,21 +31,21 @@ resource "aws_security_group" "allow_to_ec2" {
   vpc_id      = data.aws_vpc.selected.id
 
   ingress {
-    description      = "SSH for the ec2"
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-    self             = true
+    description = "SSH for the ec2"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    self        = true
   }
 
   ingress {
-    description      = "HTTP for the ec2 from elb"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    security_groups  = [aws_security_group.allow_http_traffic.id]
-    self             = true
+    description     = "HTTP for the ec2 from elb"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.allow_http_traffic.id]
+    self            = true
   }
 
   egress {
@@ -62,7 +62,7 @@ resource "aws_security_group" "allow_to_ec2" {
 }
 
 data "template_file" "user_data" {
-  template = "${file("${path.module}/files/userdata.tpl")}"
+  template = file("${path.module}/files/userdata.tpl")
 
   vars = {
     bucket_and_key_object = "http://${aws_s3_bucket.public-code-bucket.id}/app/app.zip"
@@ -110,28 +110,28 @@ resource "aws_autoscaling_policy" "autopolicy" {
 }
 
 resource "aws_elb" "elb" {
-  name               = "terraform-elb"
-  security_groups    = [ aws_security_group.allow_http_traffic.id ]
-  subnets            = local.subnet_ids_list
+  name            = "terraform-elb"
+  security_groups = [aws_security_group.allow_http_traffic.id]
+  subnets         = local.subnet_ids_list
 
   listener {
-    instance_port = 80
+    instance_port     = 80
     instance_protocol = "http"
-    lb_port = 80
-    lb_protocol = "http"
+    lb_port           = 80
+    lb_protocol       = "http"
   }
 
   health_check {
-    healthy_threshold = 2
+    healthy_threshold   = 2
     unhealthy_threshold = 2
-    timeout = 3
-    target = "HTTP:80/"
-    interval = 30
+    timeout             = 3
+    target              = "HTTP:80/"
+    interval            = 30
   }
 
-  cross_zone_load_balancing = true
-  idle_timeout = 400
-  connection_draining = true
+  cross_zone_load_balancing   = true
+  idle_timeout                = 400
+  connection_draining         = true
   connection_draining_timeout = 400
 
   tags = {
@@ -140,8 +140,8 @@ resource "aws_elb" "elb" {
 }
 
 resource "aws_lb_cookie_stickiness_policy" "cookie_stickness" {
-  name          = "cookiestickness"
-  load_balancer = aws_elb.elb.id
-  lb_port = 80
+  name                     = "cookiestickness"
+  load_balancer            = aws_elb.elb.id
+  lb_port                  = 80
   cookie_expiration_period = 600
 }

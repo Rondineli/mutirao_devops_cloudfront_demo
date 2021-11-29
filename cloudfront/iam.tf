@@ -44,6 +44,6 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "basic_role_attach" {
-  role       = "${aws_iam_role.lambda_execution.name}"
+  role       = aws_iam_role.lambda_execution.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }

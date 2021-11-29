@@ -9,7 +9,7 @@ variable "ssh_key" {
 }
 
 variable "aliases" {
-  type = string
+  type        = string
   description = "Domain aliases superated by coma: ie: my-cdn.mydomain.com,*.mydomain.com"
 }
 
@@ -24,12 +24,12 @@ variable "instance_type" {
 }
 
 variable "environment" {
-  type = string
+  type    = string
   default = "dev"
 }
 
 variable "short_application_name" {
-  type = string
+  type    = string
   default = "cf-demo"
 }
 

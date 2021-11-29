@@ -13,7 +13,7 @@ data "aws_subnet_ids" "subnet_ids" {
 data "aws_availability_zones" "allzones" {}
 
 data "aws_ami" "ec2" {
-  most_recent      = true
-  name_regex       = "amzn2-ami-hvm*"
-  owners           = ["amazon"]
+  most_recent = true
+  name_regex  = "amzn2-ami-hvm*"
+  owners      = ["amazon"]
 }

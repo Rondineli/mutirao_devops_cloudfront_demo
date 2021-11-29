@@ -24,9 +24,9 @@ resource "aws_cloudfront_distribution" "elb_distro" {
     }
   }
 
-  enabled             = true
-  is_ipv6_enabled     = true
-  comment             = "Some comment"
+  enabled         = true
+  is_ipv6_enabled = true
+  comment         = "Some comment"
 
   // domain aliases
   aliases = local.aliases
@@ -38,7 +38,7 @@ resource "aws_cloudfront_distribution" "elb_distro" {
     target_origin_id = "my-elb"
 
     forwarded_values {
-      headers = [ "X-Header-Foo", "X-header-bar"]
+      headers      = [ "X-Header-Foo", "X-header-bar"]
       query_string = false
 
       cookies {

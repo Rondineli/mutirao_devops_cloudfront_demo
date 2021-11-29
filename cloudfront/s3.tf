@@ -36,17 +36,17 @@ resource "aws_s3_bucket" "public-code-bucket" {
 data "template_file" "static" {
   template = file("${path.module}/files/policy.tpl")
   vars = {
-    principal_arn                  = data.aws_caller_identity.account.arn
-    bucket_name                    = aws_s3_bucket.this-bucket.id
-    OAI_ID                         = aws_cloudfront_origin_access_identity.this.id
+    principal_arn = data.aws_caller_identity.account.arn
+    bucket_name   = aws_s3_bucket.this-bucket.id
+    OAI_ID        = aws_cloudfront_origin_access_identity.this.id
   }
 }
 
 resource "aws_s3_bucket_object" "zip_files" {
-  bucket   = aws_s3_bucket.public-code-bucket.id
-  key      = "app/app.zip"
-  source   = "${path.module}/../app/app.zip"
-  etag     = filemd5("${path.module}/../app/app.zip")
+  bucket = aws_s3_bucket.public-code-bucket.id
+  key    = "app/app.zip"
+  source = "${path.module}/../app/app.zip"
+  etag   = filemd5("${path.module}/../app/app.zip")
 }
 
 resource "aws_s3_bucket_policy" "assets" {
