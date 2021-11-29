@@ -20,6 +20,7 @@ class TestOriginRequest(unittest.TestCase):
                 {
                     'cf': {
                         'request': {
+                            'uri': '/redirect-to-home',
                             'headers': {
                                 'accept-language': [
                                     {
@@ -46,7 +47,7 @@ class TestOriginRequest(unittest.TestCase):
             ]
         }
 
-    def test_origin_request_with_user_agent(self):
+    def test_viewer_request_redirect(self):
         response = handler(self.event, self.context)
-        assert response['headers']['user-agent'] == [{'key': 'User-Agent', 'value': 'myDummyUseragent'}] # noqa
-        assert len(list(response['headers'].keys())) == 3
+        assert response['headers']['location'] == [{'key': 'Location', 'value': 'https://cf-demo.rondi.ninja/'}] # noqa
+        assert len(list(response['headers'].keys())) == 1

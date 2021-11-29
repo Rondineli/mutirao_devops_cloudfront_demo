@@ -1,27 +1,3 @@
-data "aws_vpc" "selected" {
-  id = var.vpc_id
-}
-
-data "aws_subnet" "selected" {
-  id = var.subnet_id
-}
-
-data "aws_availability_zones" "allzones" {}
-
-data "aws_ami" "ec2" {
- most_recent = true
-
- filter {
-   name   = "owner-alias"
-   values = ["amazon"]
- }
-
- filter {
-   name   = "name"
-   values = ["amzn2-ami-hvm*"]
- }
-}
-
 resource "aws_security_group" "allow_http_traffic" {
   name        = "allow_http"
   description = "Allow http inbound traffic"
@@ -50,7 +26,7 @@ resource "aws_security_group" "allow_http_traffic" {
 }
 
 resource "aws_security_group" "allow_to_ec2" {
-  name        = "allow_ssh"
+  name        = "allow_ssh_ec2_instance"
   description = "Allow ssh inbound traffic"
   vpc_id      = data.aws_vpc.selected.id
 
@@ -58,7 +34,7 @@ resource "aws_security_group" "allow_to_ec2" {
     description      = "SSH for the ec2"
     from_port        = 22
     to_port          = 22
-    protocol         = "ssh"
+    protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
     self             = true
   }
@@ -88,20 +64,19 @@ resource "aws_security_group" "allow_to_ec2" {
 data "template_file" "user_data" {
   template = "${file("${path.module}/files/userdata.tpl")}"
 
-  vars {
-    foo = "bar"
+  vars = {
+    bucket_and_key_object = "http://${aws_s3_bucket.public-code-bucket.id}/app/app.zip"
   }
 }
 
 resource "aws_launch_configuration" "lc-app-nodes" {
   associate_public_ip_address = true
-  iam_instance_profile        = var.instance_profile_name
   image_id                    = data.aws_ami.ec2.id
-  instance_type               = var.instance_profile
+  instance_type               = var.instance_type
   name_prefix                 = "flask-example-app"
-  security_groups             = [aws_security_group.allow_to_ec2]
-  user_data                   = data.user_data.rendered
-  key_name                    = var.key_name
+  security_groups             = [aws_security_group.allow_to_ec2.id]
+  user_data                   = data.template_file.user_data.rendered
+  key_name                    = var.ssh_key
 
   lifecycle {
     create_before_destroy = true
@@ -109,16 +84,15 @@ resource "aws_launch_configuration" "lc-app-nodes" {
 }
 
 resource "aws_autoscaling_group" "all_apps" {
+  depends_on           = [aws_elb.elb]
   desired_capacity     = 1
   launch_configuration = aws_launch_configuration.lc-app-nodes.id
   health_check_type    = "ELB"
   max_size             = 3
   min_size             = 1
   name                 = "flask-example-app"
-  vpc_zone_identifier  = [data.aws_subnet.selected.id]
-  availability_zones   = [ data.aws_availability_zones.allzones.names ]
-  load_balancers       =
-
+  vpc_zone_identifier  = local.subnet_ids_list
+  load_balancers       = [aws_elb.elb.name]
 
   tag {
     key                 = "Name"
@@ -136,9 +110,9 @@ resource "aws_autoscaling_policy" "autopolicy" {
 }
 
 resource "aws_elb" "elb" {
-  name = "terraform-elb"
-  availability_zones = [data.aws_availability_zones.allzones.names ]
-  security_groups = [ aws_security_group.allow_http_traffic.id ]
+  name               = "terraform-elb"
+  security_groups    = [ aws_security_group.allow_http_traffic.id ]
+  subnets            = local.subnet_ids_list
 
   listener {
     instance_port = 80
@@ -160,7 +134,7 @@ resource "aws_elb" "elb" {
   connection_draining = true
   connection_draining_timeout = 400
 
-  tags {
+  tags = {
     Name = "flask-app-elb"
   }
 }
@@ -170,8 +144,4 @@ resource "aws_lb_cookie_stickiness_policy" "cookie_stickness" {
   load_balancer = aws_elb.elb.id
   lb_port = 80
   cookie_expiration_period = 600
-}
-
-output "elb-dns" {
-  value = aws_elb.elb.dns_name
 }

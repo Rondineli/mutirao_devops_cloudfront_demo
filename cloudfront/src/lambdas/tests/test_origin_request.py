@@ -46,7 +46,7 @@ class TestOriginRequest(unittest.TestCase):
             ]
         }
 
-    def test_origin_request_with_user_agent(self):
+    def test_origin_request(self):
         response = handler(self.event, self.context)
         assert response['headers']['x-user-agent-viewer'] == [{'key': 'X-User-Agent-Viewer', 'value': 'myDummyUseragent'}] # noqa
         assert response['headers']['cloudfront-viewer-country'] == [{'key': 'Cloudfront-Viewer-Country', 'value': 'IE'}] # noqa

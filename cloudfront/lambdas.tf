@@ -7,6 +7,8 @@ resource "aws_lambda_function" "origin_function_response" {
   handler          = "main.handler"
   runtime          = "python3.8"
   publish          = true
+  provider         = aws.us-east-1
+
 }
 
 // Prep to the origin request
@@ -18,6 +20,8 @@ resource "aws_lambda_function" "origin_function_request" {
   handler          = "main.handler"
   runtime          = "python3.8"
   publish          = true
+  provider         = aws.us-east-1
+
 }
 
 // Request from the viewer
@@ -29,6 +33,8 @@ resource "aws_lambda_function" "viewer_function_request" {
   handler          = "main.handler"
   runtime          = "python3.8"
   publish          = true
+  provider         = aws.us-east-1
+
 }
 
 // Response from origin to the viewer
@@ -40,6 +46,8 @@ resource "aws_lambda_function" "viewer_function_response" {
   handler          = "main.handler"
   runtime          = "python3.8"
   publish          = true
+  provider         = aws.us-east-1
+
 }
 
 data "archive_file" "lambda_zip_origin_request" {
@@ -80,6 +88,7 @@ resource "aws_lambda_permission" "allow_cf_origin_response" {
   action        = "lambda:*"
   function_name = aws_lambda_function.origin_function_response.function_name
   principal     = "edgelambda.amazonaws.com"
+  provider      = aws.us-east-1
 }
 
 resource "aws_lambda_permission" "allow_cf_viewer_request" {
@@ -88,6 +97,8 @@ resource "aws_lambda_permission" "allow_cf_viewer_request" {
   action        = "lambda:*"
   function_name = aws_lambda_function.viewer_function_request.function_name
   principal     = "edgelambda.amazonaws.com"
+  provider      = aws.us-east-1
+
 }
 
 resource "aws_lambda_permission" "allow_cf_viewer_response" {
@@ -96,4 +107,5 @@ resource "aws_lambda_permission" "allow_cf_viewer_response" {
   action        = "lambda:*"
   function_name = aws_lambda_function.viewer_function_response.function_name
   principal     = "edgelambda.amazonaws.com"
+  provider      = aws.us-east-1
 }

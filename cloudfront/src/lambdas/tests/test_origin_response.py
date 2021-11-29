@@ -52,7 +52,7 @@ class TestOriginRequest(unittest.TestCase):
                                 'cloudfront-viewer-country': [
                                     {
                                         'key': 'Cloudfront-Viewer-Country',
-                                        'value': 'IE'
+                                        'value': 'BR'
                                     }
                                 ],
                                 'x-user-agent-viewer': [
@@ -68,8 +68,8 @@ class TestOriginRequest(unittest.TestCase):
             ]
         }
 
-    def test_origin_request_with_locale(self):
+    def test_origin_response(self):
         response = handler(self.event, self.context)
         assert response['headers']['x-locale'] == [{'key': 'x-locale', 'value': 'en-IE'}] # noqa
-        assert response['headers']['cloudfront-viewer-country'] == [{'key': 'Cloudfront-Viewer-Country', 'value': 'IE'}] # noqa
+        assert response['headers']['cloudfront-viewer-country'] == [{'key': 'Cloudfront-Viewer-Country', 'value': 'BR'}] # noqa
         assert len(list(response['headers'].keys())) == 3

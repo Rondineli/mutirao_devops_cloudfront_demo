@@ -68,7 +68,7 @@ class TestOriginRequest(unittest.TestCase):
             ]
         }
 
-    def test_origin_request_with_locale(self):
+    def test_viewer_response(self):
         response = handler(self.event, self.context)
         assert response['headers']['x-locale'] == [{'key': 'x-locale', 'value': 'en-IE'}] # noqa
         assert response['headers']['cloudfront-viewer-country'] == [{'key': 'Cloudfront-Viewer-Country', 'value': 'IE'}] # noqa
