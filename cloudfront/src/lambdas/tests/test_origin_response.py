@@ -24,7 +24,7 @@ class TestOriginRequest(unittest.TestCase):
                                 'cloudfront-viewer-country': [
                                     {
                                         'key': 'Cloudfront-Viewer-Country',
-                                        'value': 'IE'
+                                        'value': 'BR'
                                     }
                                 ],
                                 'x-locale': [
